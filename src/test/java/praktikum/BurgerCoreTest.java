@@ -1,6 +1,8 @@
 package praktikum;
 
 import org.junit.Test;
+import java.util.Arrays;
+import java.util.List;
 import static org.junit.Assert.*;
 
 /**
@@ -10,20 +12,28 @@ import static org.junit.Assert.*;
 public class BurgerCoreTest extends BaseBurgerTest {
 
     @Test
-    public void testSetBunsCorrectlyAssignsBun() {
+    public void testSetBunsIsNotNull() {
         burger.setBuns(blackBun);
-
         assertNotNull("Bun should be set", burger.bun);
-        assertEquals("Bun name should match",
-                "black bun", burger.bun.getName());
+    }
+
+    @Test
+    public void testSetBunsNameMatches() {
+        burger.setBuns(blackBun);
+        assertEquals("Bun name should match", "black bun", burger.bun.getName());
     }
 
     @Test
     public void testAddIngredientIncreasesListSize() {
+        int initialSize = burger.ingredients.size();
         burger.addIngredient(cutlet);
+        assertEquals("Ingredients list size should increase by 1",
+                initialSize + 1, burger.ingredients.size());
+    }
 
-        assertEquals("Ingredients list should contain 1 element",
-                1, burger.ingredients.size());
+    @Test
+    public void testAddIngredientContainsAddedIngredient() {
+        burger.addIngredient(cutlet);
         assertTrue("List should contain added ingredient",
                 burger.ingredients.contains(cutlet));
     }
@@ -32,11 +42,17 @@ public class BurgerCoreTest extends BaseBurgerTest {
     public void testRemoveIngredientDecreasesListSize() {
         burger.addIngredient(cutlet);
         burger.addIngredient(dinosaur);
-
+        int initialSize = burger.ingredients.size();
         burger.removeIngredient(0);
+        assertEquals("After removal should decrease by 1",
+                initialSize - 1, burger.ingredients.size());
+    }
 
-        assertEquals("After removal should have 1 ingredient",
-                1, burger.ingredients.size());
+    @Test
+    public void testRemoveIngredientRemovesCorrectIngredient() {
+        burger.addIngredient(cutlet);
+        burger.addIngredient(dinosaur);
+        burger.removeIngredient(0);
         assertFalse("Removed ingredient should not be present",
                 burger.ingredients.contains(cutlet));
     }
@@ -44,26 +60,17 @@ public class BurgerCoreTest extends BaseBurgerTest {
     @Test(expected = IndexOutOfBoundsException.class)
     public void testRemoveIngredientWithInvalidIndexThrowsException() {
         burger.addIngredient(cutlet);
-        burger.removeIngredient(5); // Invalid index
+        burger.removeIngredient(5);
     }
 
     @Test
     public void testMoveIngredientChangesPositionsCorrectly() {
-        // Add three ingredients
         burger.addIngredient(cutlet);
         burger.addIngredient(dinosaur);
         burger.addIngredient(sausage);
-
-        // Move sausage from position 2 to position 0
         burger.moveIngredient(2, 0);
-
-        // Check new order: sausage, cutlet, dinosaur
-        assertEquals("First position should be sausage",
-                sausage, burger.ingredients.get(0));
-        assertEquals("Second position should be cutlet",
-                cutlet, burger.ingredients.get(1));
-        assertEquals("Third position should be dinosaur",
-                dinosaur, burger.ingredients.get(2));
+        List<Ingredient> expected = Arrays.asList(sausage, cutlet, dinosaur);
+        assertEquals("Ingredients order is wrong", expected, burger.ingredients);
     }
 
     @Test
@@ -72,8 +79,7 @@ public class BurgerCoreTest extends BaseBurgerTest {
         burger.addIngredient(cutlet);
         burger.addIngredient(dinosaur);
         burger.addIngredient(hotSauce);
-
-        float expectedPrice = 100.0f * 2 + 100.0f + 200.0f + 100.0f; // 200 + 100 + 200 + 100 = 600
+        float expectedPrice = 100.0f * 2 + 100.0f + 200.0f + 100.0f;
         assertEquals("Price should be calculated correctly",
                 expectedPrice, burger.getPrice(), 0.001f);
     }
@@ -84,21 +90,44 @@ public class BurgerCoreTest extends BaseBurgerTest {
     }
 
     @Test
-    public void testGetReceiptFormatsCorrectly() {
+    public void testGetReceiptContainsBunName() {
+        burger.setBuns(blackBun);
+        String receipt = burger.getReceipt();
+        assertTrue("Receipt should contain bun name", receipt.contains("black bun"));
+    }
+
+    @Test
+    public void testGetReceiptContainsCutletName() {
+        burger.setBuns(blackBun);
+        burger.addIngredient(cutlet);
+        String receipt = burger.getReceipt();
+        assertTrue("Receipt should contain cutlet", receipt.contains("cutlet"));
+    }
+
+    @Test
+    public void testGetReceiptContainsHotSauceName() {
+        burger.setBuns(blackBun);
+        burger.addIngredient(hotSauce);
+        String receipt = burger.getReceipt();
+        assertTrue("Receipt should contain hot sauce", receipt.contains("hot sauce"));
+    }
+
+    @Test
+    public void testGetReceiptContainsPriceLabel() {
+        burger.setBuns(blackBun);
+        burger.addIngredient(cutlet);
+        String receipt = burger.getReceipt();
+        assertTrue("Receipt should contain Price label", receipt.contains("Price:"));
+    }
+
+    @Test
+    public void testGetReceiptPriceIsCorrect() {
         burger.setBuns(blackBun);
         burger.addIngredient(cutlet);
         burger.addIngredient(hotSauce);
-
         String receipt = burger.getReceipt();
-
-        assertTrue("Receipt should contain bun name", receipt.contains("black bun"));
-        assertTrue("Receipt should contain cutlet", receipt.contains("cutlet"));
-        assertTrue("Receipt should contain hot sauce", receipt.contains("hot sauce"));
-        assertTrue("Receipt should contain Price label", receipt.contains("Price:"));
-
-        // Extract and verify price
         float extractedPrice = extractPriceFromReceipt(receipt);
-        float expectedPrice = 400.0f; // 200 (bun*2) + 100 (cutlet) + 100 (hot sauce)
+        float expectedPrice = 400.0f;
         assertEquals("Price in receipt should be correct",
                 expectedPrice, extractedPrice, 0.001f);
     }
@@ -107,21 +136,26 @@ public class BurgerCoreTest extends BaseBurgerTest {
     public void testReceiptStructureWithTopBun() {
         burger.setBuns(blackBun);
         String receipt = burger.getReceipt();
-
         assertTrue("Receipt should start with top bun",
                 receipt.startsWith("(==== black bun ====)"));
     }
 
     @Test
-    public void testReceiptContainsIngredientTypeLowerCase() {
+    public void testReceiptContainsFillingTypeLowerCase() {
         burger.setBuns(blackBun);
         burger.addIngredient(cutlet);
-        burger.addIngredient(hotSauce);
-
         String receipt = burger.getReceipt();
+        assertTrue("Receipt should contain filling type in lowercase",
+                receipt.contains("filling"));
+    }
 
-        assertTrue("Receipt should contain ingredient type in lowercase",
-                receipt.contains("filling") || receipt.contains("sauce"));
+    @Test
+    public void testReceiptContainsSauceTypeLowerCase() {
+        burger.setBuns(blackBun);
+        burger.addIngredient(hotSauce);
+        String receipt = burger.getReceipt();
+        assertTrue("Receipt should contain sauce type in lowercase",
+                receipt.contains("sauce"));
     }
 
     @Test(expected = NullPointerException.class)

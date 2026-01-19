@@ -4,6 +4,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Collection;
 import static org.junit.Assert.assertEquals;
 
@@ -12,37 +13,69 @@ import static org.junit.Assert.assertEquals;
  * Tests different ingredient combinations.
  */
 @RunWith(Parameterized.class)
-public class BurgerPriceParameterizedTest extends BaseBurgerTest {
+public class BurgerPriceParameterizedTest {
 
-    @Parameterized.Parameters(name = "Test {index}: ingredients={0}, price={1}")
+    private final String description;
+    private final List<Ingredient> ingredients;
+    private final Bun bun;
+    private final float expectedPrice;
+
+    public BurgerPriceParameterizedTest(String description, List<Ingredient> ingredients,
+                                        Bun bun, float expectedPrice) {
+        this.description = description;
+        this.ingredients = ingredients;
+        this.bun = bun;
+        this.expectedPrice = expectedPrice;
+    }
+
+    @Parameterized.Parameters(name = "{0}")
     public static Collection<Object[]> getPriceTestData() {
         return Arrays.asList(new Object[][] {
-                // Number of ingredients, expected price
-                {0, 200.0f},   // Bun only (100 * 2)
-                {1, 300.0f},   // Bun + cutlet (200 + 100)
-                {2, 500.0f},   // Bun + cutlet + dinosaur (200 + 100 + 200)
-                {3, 800.0f},   // Bun + cutlet + dinosaur + sausage (200 + 100 + 200 + 300)
-                {4, 1000.0f},  // All fillings (200 + 100 + 200 + 300 + 200 for sauce)
+                {"Black bun only",
+                        Arrays.asList(),
+                        new Bun("black bun", 100.0f),
+                        200.0f},
+                {"Black bun + cutlet",
+                        Arrays.asList(new Ingredient(IngredientType.FILLING, "cutlet", 100.0f)),
+                        new Bun("black bun", 100.0f),
+                        300.0f},
+                {"Black bun + cutlet + dinosaur",
+                        Arrays.asList(
+                                new Ingredient(IngredientType.FILLING, "cutlet", 100.0f),
+                                new Ingredient(IngredientType.FILLING, "dinosaur", 200.0f)
+                        ),
+                        new Bun("black bun", 100.0f),
+                        500.0f},
+                {"Black bun + cutlet + dinosaur + sausage",
+                        Arrays.asList(
+                                new Ingredient(IngredientType.FILLING, "cutlet", 100.0f),
+                                new Ingredient(IngredientType.FILLING, "dinosaur", 200.0f),
+                                new Ingredient(IngredientType.FILLING, "sausage", 300.0f)
+                        ),
+                        new Bun("black bun", 100.0f),
+                        800.0f},
+                {"Black bun + cutlet + dinosaur + sausage + sour cream",
+                        Arrays.asList(
+                                new Ingredient(IngredientType.FILLING, "cutlet", 100.0f),
+                                new Ingredient(IngredientType.FILLING, "dinosaur", 200.0f),
+                                new Ingredient(IngredientType.FILLING, "sausage", 300.0f),
+                                new Ingredient(IngredientType.SAUCE, "sour cream", 200.0f)
+                        ),
+                        new Bun("black bun", 100.0f),
+                        1000.0f}
         });
     }
 
-    @Parameterized.Parameter
-    public int ingredientCount;
-
-    @Parameterized.Parameter(1)
-    public float expectedPrice;
-
     @Test
-    public void testGetPriceWithDifferentIngredientCount() {
-        burger.setBuns(blackBun);
+    public void testPriceCalculationForDifferentIngredientCombinations() {
+        Burger burger = new Burger();
+        burger.setBuns(bun);
 
-        // Add ingredients in specific order
-        if (ingredientCount >= 1) burger.addIngredient(cutlet);
-        if (ingredientCount >= 2) burger.addIngredient(dinosaur);
-        if (ingredientCount >= 3) burger.addIngredient(sausage);
-        if (ingredientCount >= 4) burger.addIngredient(sourCream);
+        for (Ingredient ingredient : ingredients) {
+            burger.addIngredient(ingredient);
+        }
 
-        assertEquals(String.format("Wrong price for %d ingredients", ingredientCount),
+        assertEquals("Price calculation is incorrect for: " + description,
                 expectedPrice, burger.getPrice(), 0.001f);
     }
 }

@@ -3,6 +3,8 @@ package praktikum;
 import org.junit.Before;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import java.util.ArrayList;
+import java.util.List;
 import static org.mockito.Mockito.when;
 
 /**
@@ -74,16 +76,29 @@ public class BaseBurgerTest {
      * Helper method to extract price from receipt string.
      * Handles both comma and dot decimal separators.
      */
-    protected float extractPriceFromReceipt(String receipt) {
+    public static float extractPriceFromReceipt(String receipt) {
         String[] lines = receipt.split("\\r?\\n");
         for (String line : lines) {
             if (line.startsWith("Price: ")) {
                 String priceStr = line.substring("Price: ".length());
-                // Replace comma with dot for parsing
                 priceStr = priceStr.replace(',', '.');
                 return Float.parseFloat(priceStr);
             }
         }
         throw new IllegalArgumentException("Price not found in receipt");
+    }
+
+    /**
+     * Helper method to extract ingredient lines from receipt.
+     */
+    public static List<String> extractIngredientLinesFromReceipt(String receipt) {
+        List<String> ingredientLines = new ArrayList<>();
+        String[] lines = receipt.split("\\r?\\n");
+        for (String line : lines) {
+            if (line.startsWith("= ")) {
+                ingredientLines.add(line);
+            }
+        }
+        return ingredientLines;
     }
 }
