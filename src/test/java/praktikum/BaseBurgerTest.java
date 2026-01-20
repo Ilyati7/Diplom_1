@@ -1,5 +1,6 @@
 package praktikum;
 
+import org.junit.After;
 import org.junit.Before;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
@@ -7,13 +8,11 @@ import java.util.ArrayList;
 import java.util.List;
 import static org.mockito.Mockito.when;
 
-/**
- * Base test class with common mocks.
- * Contains setup for mock objects for buns and ingredients.
- */
+
 public class BaseBurgerTest {
 
     protected Burger burger;
+    private AutoCloseable closeable;
 
     @Mock
     protected Bun blackBun;
@@ -38,7 +37,7 @@ public class BaseBurgerTest {
 
     @Before
     public void setUpMocks() {
-        MockitoAnnotations.openMocks(this);
+        closeable = MockitoAnnotations.openMocks(this);
 
         // Setup bun mocks
         when(blackBun.getName()).thenReturn("black bun");
@@ -72,10 +71,14 @@ public class BaseBurgerTest {
         burger = new Burger();
     }
 
-    /**
-     * Helper method to extract price from receipt string.
-     * Handles both comma and dot decimal separators.
-     */
+    @After
+    public void closeMocks() throws Exception {
+        if (closeable != null) {
+            closeable.close();
+        }
+    }
+
+
     public static float extractPriceFromReceipt(String receipt) {
         String[] lines = receipt.split("\\r?\\n");
         for (String line : lines) {
@@ -88,9 +91,7 @@ public class BaseBurgerTest {
         throw new IllegalArgumentException("Price not found in receipt");
     }
 
-    /**
-     * Helper method to extract ingredient lines from receipt.
-     */
+
     public static List<String> extractIngredientLinesFromReceipt(String receipt) {
         List<String> ingredientLines = new ArrayList<>();
         String[] lines = receipt.split("\\r?\\n");

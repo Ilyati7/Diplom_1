@@ -17,6 +17,7 @@ public class BurgerReceiptParameterizedTest {
     private final float[] ingredientPrices;
     private final float expectedPrice;
 
+    @SuppressWarnings("unused")
     public BurgerReceiptParameterizedTest(String description, String bunName, float bunPrice,
                                           String[] ingredientNames, IngredientType[] ingredientTypes,
                                           float[] ingredientPrices, float expectedPrice) {
