@@ -48,7 +48,7 @@
             <scope>test</scope>
         </dependency>
 
-        <!-- Матчеры для улучшенных проверок -->
+        <!-- Матчеры для улучшенных проверки -->
         <dependency>
             <groupId>org.hamcrest</groupId>
             <artifactId>hamcrest</artifactId>
@@ -99,6 +99,32 @@
                         <goals>
                             <goal>report</goal>
                         </goals>
+                    </execution>
+
+                    <!-- Проверка покрытия -->
+                    <execution>
+                        <id>check</id>
+                        <phase>test</phase>
+                        <goals>
+                            <goal>check</goal>
+                        </goals>
+                        <configuration>
+                            <rules>
+                                <rule>
+                                    <element>CLASS</element>
+                                    <limits>
+                                        <limit>
+                                            <counter>LINE</counter>
+                                            <value>COVEREDRATIO</value>
+                                            <minimum>1.0</minimum> <!-- 100% покрытие -->
+                                        </limit>
+                                    </limits>
+                                    <includes>
+                                        <include>praktikum.Burger</include>
+                                    </includes>
+                                </rule>
+                            </rules>
+                        </configuration>
                     </execution>
                 </executions>
             </plugin>
