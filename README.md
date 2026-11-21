@@ -1,4 +1,7 @@
 > 📁 Это часть моего QA-портфолио. Общий обзор всех проектов: [qa-portfolio/automation](https://github.com/Ilyati7/qa-portfolio/tree/main/automation)
+>
+> Серия состоит из трёх дипломных проектов: юнит-тесты (этот репозиторий), API-тесты ([Diplom_2](https://github.com/Ilyati7/Diplom_2)) и UI-тесты ([Diplom_3](https://github.com/Ilyati7/Diplom_3)).
+
 # Stellar Burgers - Тестирование системы заказа бургеров
 
 ## 📋 Описание проекта
