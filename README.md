@@ -1,3 +1,4 @@
+> 📁 Это часть моего QA-портфолио. Общий обзор всех проектов: [qa-portfolio/automation](https://github.com/Ilyati7/qa-portfolio/tree/main/automation)
 # Stellar Burgers - Тестирование системы заказа бургеров
 
 ## 📋 Описание проекта
